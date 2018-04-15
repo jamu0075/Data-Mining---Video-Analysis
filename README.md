@@ -20,4 +20,11 @@ to predict the next location of an object.
 ### Applications:  
 Having a fast and accurate real-time object detection algorithm could allow cameras to constantly, and accurately,
 search for threats in public spaces. It could also be used to assist blind people by conveying their surrondings through audio.
-As mentioned before, the applications are essentially limitless.
+As mentioned before, the applications are essentially limitless.  
+
+### Video Demonstration:  
+*Link Here*  
+
+### Final Paper:  
+*Link Here*
+
