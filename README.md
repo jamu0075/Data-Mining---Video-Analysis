@@ -1,4 +1,4 @@
-# Video Analysis  
+# Real-Time Video Analysis  
 
 ## Contributors: Akash, Jacob, Avery  
 
@@ -6,7 +6,8 @@
 Our goal for this project was to see if we could modify a real-time object recognition algorithm (Darkflow/Tensorflow) 
 to predict the next location of an object. We used this algorithm and a collection of ~14 million images to 'teach' the
 algorithm to recognize the most common objects in day to day life. A simple inital boost in speed was to scan the video every 30 frames
-rather than every frame, providing and instant 30x increase in speed. The bulk of the project is teaching the algorithm movement patterns.
+rather than every frame, providing and instant 30x increase in speed. The bulk of the project is teaching the algorithm how objects
+move in a frame.
 
 ### Questions:  
 1. Is it even possible?  
