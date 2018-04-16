@@ -1,3 +1,4 @@
+from collections import defaultdict
 from darkflow.net.build import TFNet
 from multiprocessing import Process, Pipe
 from numpy import array
@@ -9,6 +10,7 @@ import time
 
 GET_FPS_EVERY = 180  # frames
 PREDICTOR_WAIT_TIMEOUT = 1  # s
+MATCH_BUCKET_SIZE = 1000  # px
 
 
 class Prediction:
@@ -33,7 +35,7 @@ class Prediction:
     def get_bounds_after_n_frames(self, nframes):
         tl = self.top_left + self.vtl * nframes
         br = self.bottom_right + self.vbr * nframes
-        return tuple(tl), tuple(br)
+        return tuple(map(int, tl)), tuple(map(int, br))
 
     def __hash__(self):
         return self.hash
@@ -59,22 +61,33 @@ def project_file(path):
     )
 
 
+def get_bucket(coord):
+    return tuple(map(int, coord // MATCH_BUCKET_SIZE))
+
+
 def match_objects(objs1, objs2):
-    objs1, objs2 = list(map(Prediction, objs1)), list(map(Prediction, objs2))
-    matches = {}
-    for y in objs2:
-        best_dist, best_match = float('inf'), None
-        for x in objs1:
-            if x in matches or x.label != y.label:
-                continue
-            dist = x.dist_sq(y)
-            if dist < best_dist:
-                best_dist, best_match = dist, x
-        if best_match:
-            matches[best_match] = y
-        else:
-            print("{} only matched once".format(y.label))
-    return matches.items()
+    matches = []
+
+    buckets_o1, buckets_o2 = defaultdict(list), defaultdict(list)
+    for o in objs1:
+        buckets_o1[get_bucket(o.center)].append(o)
+    for o in objs2:
+        buckets_o2[get_bucket(o.center)].append(o)
+
+    for bucket, items in buckets_o2.items():
+        for x in items:
+            best_dist, best_match = float('inf'), None
+            for y in buckets_o1[bucket]:
+                dist = x.dist_sq(y)
+                if y.label == x.label and dist < best_dist:
+                    best_dist, best_match = dist, y
+            if best_match:
+                print("{}: {} matched".format(bucket, x.label))
+                matches.append((best_match, x))
+            else:
+                print("{}: {} only seen once".format(bucket, x.label))
+
+    return matches
 
 
 def predict_with_velocity(obj_matches):
@@ -91,7 +104,10 @@ def predict_loop(conn):
             # print("Waiting for image")
             f1, f2 = conn.recv()
             # print("Recieved image, predicting...")
-            pred1, pred2 = (tfnet.return_predict(f) for f in [f1, f2])
+            pred1, pred2 = (
+                [Prediction(p) for p in tfnet.return_predict(f)]
+                for f in [f1, f2]
+            )
             matched_pairs = match_objects(pred1, pred2)
             predictions = list(predict_with_velocity(matched_pairs))
             # print("Done predicting.")
