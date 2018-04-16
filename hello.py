@@ -10,7 +10,7 @@ import time
 
 GET_FPS_EVERY = 180  # frames
 PREDICTOR_WAIT_TIMEOUT = 1  # s
-MATCH_BUCKET_SIZE = 1000  # px
+MATCH_BUCKET_SIZE = 100  # px
 
 
 class Prediction:
@@ -29,8 +29,9 @@ class Prediction:
         return sum((prediction.center - self.center) ** 2)
 
     def set_velocity_away_from(self, prev):
-        self.vtl = self.top_left - prev.top_left
-        self.vbr = self.bottom_right - prev.bottom_right
+        self.vtl = self.vbr = (self.center - prev.center)*0.01
+        # self.vtl = self.top_left - prev.top_left
+        # self.vbr = self.bottom_right - prev.bottom_right
 
     def get_bounds_after_n_frames(self, nframes):
         tl = self.top_left + self.vtl * nframes
@@ -65,14 +66,20 @@ def get_bucket(coord):
     return tuple(map(int, coord // MATCH_BUCKET_SIZE))
 
 
-def match_objects(objs1, objs2):
-    matches = []
+def split_into_buckets(objs):
+    buckets = defaultdict(list)
+    for o in objs:
+        pos = get_bucket(o.center)
+        for shift in ((0, 0), (0, 1), (1, 0), (1, 1)):
+            bkt = (2*pos[0] + shift[0], 2*pos[1] + shift[1])
+            buckets[bkt].append(o)
+    return buckets
 
-    buckets_o1, buckets_o2 = defaultdict(list), defaultdict(list)
-    for o in objs1:
-        buckets_o1[get_bucket(o.center)].append(o)
-    for o in objs2:
-        buckets_o2[get_bucket(o.center)].append(o)
+
+def match_objects(objs1, objs2):
+    matches = {}
+
+    buckets_o1, buckets_o2 = map(split_into_buckets, (objs1, objs2))
 
     for bucket, items in buckets_o2.items():
         for x in items:
@@ -82,12 +89,12 @@ def match_objects(objs1, objs2):
                 if y.label == x.label and dist < best_dist:
                     best_dist, best_match = dist, y
             if best_match:
-                print("{}: {} matched".format(bucket, x.label))
-                matches.append((best_match, x))
-            else:
-                print("{}: {} only seen once".format(bucket, x.label))
+                # print("{}: {} matched".format(bucket, x.label))
+                matches[x] = best_match
+            # else:
+            #     print("{}: {} only seen once".format(bucket, x.label))
 
-    return matches
+    return list(matches.items())
 
 
 def predict_with_velocity(obj_matches):
@@ -110,6 +117,10 @@ def predict_loop(conn):
             )
             matched_pairs = match_objects(pred1, pred2)
             predictions = list(predict_with_velocity(matched_pairs))
+            for p in predictions:
+                print("Found {} at {} with velocities {}, {}".format(
+                    p.label, p.center, p.vtl, p.vbr
+                ))
             # print("Done predicting.")
             conn.send(predictions)
     except EOFError:
