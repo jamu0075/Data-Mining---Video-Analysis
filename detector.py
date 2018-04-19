@@ -118,7 +118,7 @@ def predict_loop(conn):
             matched_pairs = match_objects(pred1, pred2)
             predictions = list(predict_with_velocity(matched_pairs))
             for p in predictions:
-                print("Found {} at {} with velocities {}, {}".format(
+                print("Found {} at {} with velocities {}, {}.".format(
                     p.label, p.center, p.vtl, p.vbr
                 ))
             # print("Done predicting.")
