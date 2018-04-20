@@ -16,8 +16,9 @@ def project_file(path):
     )
 
 
-def coordToTuple(coord):
-    return (coord['x'], coord['y'])
+def get_bbox(prediction):
+    tl, br = prediction['topleft'], prediction['bottomright']
+    return (tl['x'], tl['y'], br['x'] - tl['x'], br['y'] - tl['y'])
 
 
 def predict_loop(conn):
@@ -42,19 +43,21 @@ options = {
     "threshold": 0.2
 }
 
-predConn, conn = Pipe()
-predictor = Process(target=predict_loop, args=(predConn,))
+pred_conn, conn = Pipe()
+predictor = Process(target=predict_loop, args=(pred_conn,))
 predictor.start()
 
 cam = cv2.VideoCapture(0)
-predictions = []
-camRead = True
+cam_read = True
+
+img_cache = []
+trackers = []
 
 print("Press q to quit.")
 
 fct, boxct = 0, 0
 start_time = 0
-while(camRead):
+while(cam_read):
     if fct % GET_FPS_EVERY == 0:
         if start_time:
             time_taken = time.time() - start_time
@@ -66,26 +69,43 @@ while(camRead):
     fct += 1
 
     # Capture frame-by-frame
-    camRead, frame = cam.read()
+    cam_read, frame = cam.read()
 
     # to test slowdown, uncomment this and comment the predictor
     # time.sleep(0.1)
 
     if conn.poll():
-        conn.send(frame)
         predictions = conn.recv()
+        trackers = []
+
+        for p in predictions:
+            tkr = cv2.TrackerKCF_create()
+            if tkr.init(img_cache[0], get_bbox(p)):
+                trackers.append((p['label'], tkr))
+
+        for img in img_cache:
+            trackers = [(lab, t) for lab, t in trackers if t.update(img)[0]]
+
+        conn.send(frame)
+        img_cache = [frame]
         boxct += 1
 
-    for p in predictions:
-        tl, br = coordToTuple(p['topleft']), coordToTuple(p['bottomright'])
-        cv2.rectangle(
-            frame, tl, br, (0, 0, 255), thickness=3
-        )
-        cv2.putText(
-            frame, p['label'], tl,
-            cv2.FONT_HERSHEY_SIMPLEX, 1,
-            (0, 0, 255), thickness=2
-        )
+    to_delete = []
+    for i, (label, tkr) in enumerate(trackers):
+        ok, bbox = tkr.update(frame)
+        if ok:
+            p1 = (int(bbox[0]), int(bbox[1]))
+            p2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
+            cv2.rectangle(frame, p1, p2, (0, 0, 255), thickness=3)
+            cv2.putText(
+                frame, label, p1,
+                cv2.FONT_HERSHEY_SIMPLEX, 1,
+                (0, 0, 255), thickness=2
+            )
+        else:
+            to_delete.append(i)
+
+    trackers = [x for i, x in enumerate(trackers) if i not in to_delete]
 
     # Display the resulting frame
     cv2.imshow('hello', frame)
