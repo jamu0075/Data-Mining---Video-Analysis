@@ -1,4 +1,4 @@
 #!/usr/bin/python
 from pytube import YouTube
 
-yt = YouTube('https://youtu.be/V98uMzYBlxU').streams.first().download()
+yt = YouTube('https://www.youtube.com/watch?v=CXECg509GJk').streams.first().download()
