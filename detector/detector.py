@@ -21,6 +21,21 @@ def get_bbox(prediction):
     return (tl['x'], tl['y'], br['x'] - tl['x'], br['y'] - tl['y'])
 
 
+class Tracker:
+
+    def __init__(self, frame, prediction):
+        self.label = prediction['label']
+        self.tracker = cv2.TrackerKCF_create()
+        self.bbox = get_bbox(prediction)
+        self.ok = self.tracker.init(frame, self.bbox)
+
+    def update(self, frame):
+        if self.ok:
+            self.ok, bbox = self.tracker.update(frame)
+            self.bbox = bbox if self.ok else None
+        return self.bbox
+
+
 def predict_loop(conn):
     tfnet = TFNet(options)
     try:
@@ -76,36 +91,27 @@ while(cam_read):
 
     if conn.poll():
         predictions = conn.recv()
-        trackers = []
-
-        for p in predictions:
-            tkr = cv2.TrackerKCF_create()
-            if tkr.init(img_cache[0], get_bbox(p)):
-                trackers.append((p['label'], tkr))
+        trackers = [Tracker(img_cache[0], p) for p in predictions]
 
         for img in img_cache:
-            trackers = [(lab, t) for lab, t in trackers if t.update(img)[0]]
+            for t in trackers:
+                t.update(img)
 
         conn.send(frame)
         img_cache = [frame]
         boxct += 1
 
-    to_delete = []
-    for i, (label, tkr) in enumerate(trackers):
-        ok, bbox = tkr.update(frame)
-        if ok:
+    for i, tkr in enumerate(trackers):
+        bbox = tkr.update(frame) if fct % len(trackers) == i else tkr.bbox
+        if bbox is not None:
             p1 = (int(bbox[0]), int(bbox[1]))
             p2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
             cv2.rectangle(frame, p1, p2, (0, 0, 255), thickness=3)
             cv2.putText(
-                frame, label, p1,
-                cv2.FONT_HERSHEY_SIMPLEX, 1,
+                frame, tkr.label, p1,
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                 (0, 0, 255), thickness=2
             )
-        else:
-            to_delete.append(i)
-
-    trackers = [x for i, x in enumerate(trackers) if i not in to_delete]
 
     # Display the resulting frame
     cv2.imshow('hello', frame)
