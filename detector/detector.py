@@ -102,6 +102,7 @@ while(cam_read):
         boxct += 1
 
     for i, tkr in enumerate(trackers):
+        # if it's this tracker's turn, update it, otherwise load its old bbox
         bbox = tkr.update(frame) if fct % len(trackers) == i else tkr.bbox
         if bbox is not None:
             p1 = (int(bbox[0]), int(bbox[1]))
