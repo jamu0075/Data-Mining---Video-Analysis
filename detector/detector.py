@@ -30,10 +30,9 @@ class Tracker:
         self.ok = self.tracker.init(frame, self.bbox)
 
     def update(self, frame):
-        if self.ok:
-            self.ok, bbox = self.tracker.update(frame)
-            self.bbox = bbox if self.ok else None
-        return self.bbox
+        self.ok, bbox = self.tracker.update(frame)
+        self.bbox = bbox if self.ok else None
+        return self.bbox if self.ok else None
 
 
 def predict_loop(conn):
