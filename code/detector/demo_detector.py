@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import cv2
 import time
 from argparse import ArgumentParser
@@ -13,15 +14,15 @@ args = parser.parse_args()
 
 
 det = Detector()
-cam = cv2.VideoCapture(0 if args.mp4file == 'camera' else args.mp4file)
-cam_read = True
+cap = cv2.VideoCapture(0 if args.mp4file == 'camera' else args.mp4file)
+cap_read = True
 
 det.start()
 
 print("Press q to quit.")
 
 prev_det_ct, start_time = 0, 0
-while(cam_read):
+while(cap_read):
     if det.frame_count() % GET_FPS_EVERY == 0:
 
         time_taken = time.time() - start_time
@@ -36,8 +37,8 @@ while(cam_read):
         start_time = time.time()
 
     # Capture frame-by-frame
-    cam_read, frame = cam.read()
-    if not cam_read:
+    cap_read, frame = cap.read()
+    if not cap_read:
         break
 
     # to test slowdown, uncomment this and comment the predictor
@@ -59,7 +60,7 @@ while(cam_read):
         break
 
 # When everything done, release the capture
-cam.release()
+cap.release()
 cv2.destroyAllWindows()
 
 det.stop()

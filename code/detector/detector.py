@@ -9,7 +9,7 @@ MAX_PREDICTOR_WAIT_TIME = 20  # s
 options = {
     "pbLoad": path_module_relative(__name__, "graph/yolo.pb"),
     "metaLoad": path_module_relative(__name__, "graph/yolo.meta"),
-    "threshold": 0.2
+    "threshold": 0.3
 }
 
 
