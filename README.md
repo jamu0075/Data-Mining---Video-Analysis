@@ -5,11 +5,14 @@
 ### Description:  
 Our goal for this project was to see if we could modify a real-time object recognition algorithm (Darkflow/Tensorflow) 
 to predict the next location of an object. We used a collection of ~14 million images to 'teach' the
-algorithm to recognize the most common objects in day to day life. A simple inital boost in speed was to scan the video every 30 frames
-rather than every frame, providing and instant 30x increase in speed. The bulk of the project is teaching the algorithm how objects
-move in a frame.
+algorithm to recognize the most common objects in day to day life. Our other goal, and potentially more impactful, was to 
+find a way to more reliably test object detection algorithms. If you are able to easily test for marginal improvements it
+becomes much easier to advance your algorithm.
 
 ### Questions:  
+1. How can we test our algorithm for improvements?
+    * We want to be able to check for slight speed improvements on our algorithm so we mined YouTube videos to get clips. These clips are then distributed based on their frame differnces which allowed us to sample for a desired amount of movement.
+    clips of a desired speed. As improvements are made you can easily sample from slightly faster clips.
 1. Is it even possible?  
     * Can we actually predict the next location using machine learning tools.  
 2. What is the benefit?  
@@ -22,7 +25,7 @@ move in a frame.
     accurate in real time video the applications are essentially endless.  
     
 ### Applications:  
-Having a fast and accurate real-time object detection algorithm could allow cameras to constantly, and accurately,
+By using our method of mining YouTube videos anyone is able to easily find a desired clip to test object detection. This method of sampling clips from a distribution Having a fast and accurate real-time object detection algorithm could allow cameras to constantly, and accurately,
 search for threats in public spaces. It could also be used to assist blind people by conveying their surrondings through audio.
 As mentioned before, the applications are essentially limitless.  
 
