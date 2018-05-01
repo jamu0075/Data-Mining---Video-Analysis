@@ -30,7 +30,7 @@ By using our method of mining YouTube videos anyone is able to easily find a des
 As far as object detection goes, having a fast and accurate real-time object detection algorithm could allow cameras to constantly, and accurately, search for threats in public spaces. It could also be used to assist blind people by conveying their surrondings through audio.
 As mentioned before, the applications are essentially limitless.  
 
-### Video Demonstration:  
+### Video Description:  
 *Link Here*  
 
 ### Final Paper:  
