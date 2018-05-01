@@ -25,8 +25,9 @@ becomes much easier to advance your algorithm.
     accurate in real time video the applications are essentially endless.  
     
 ### Applications:  
-By using our method of mining YouTube videos anyone is able to easily find a desired clip to test object detection. This method of sampling clips from a distribution Having a fast and accurate real-time object detection algorithm could allow cameras to constantly, and accurately,
-search for threats in public spaces. It could also be used to assist blind people by conveying their surrondings through audio.
+By using our method of mining YouTube videos anyone is able to easily find a desired clip to test object detection. This method of sampling clips from a distribution means you can easily select clips that suit your testing needs, whether you want a fast or slow clip or if you want clips with lots of objects or just a few.  
+
+As far as object detection goes, having a fast and accurate real-time object detection algorithm could allow cameras to constantly, and accurately, search for threats in public spaces. It could also be used to assist blind people by conveying their surrondings through audio.
 As mentioned before, the applications are essentially limitless.  
 
 ### Video Demonstration:  
