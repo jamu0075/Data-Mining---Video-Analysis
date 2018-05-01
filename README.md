@@ -7,8 +7,11 @@ Our goal for this project was to see if we could improve a real-time object reco
 
 ### Questions:  
 1 - Is it possible to modify the current best object classification algorithm to run quickly and accurately without needing a super computer?
+
 2 - Can we find a way to reliably test an object detection algorithm on videos of varying speed and environments?
+
 3 - Can we mine YouTube videos for interesting clips?
+
 4 - Can we use these clips to improve an object detection algorithm?  
     
 ### Applications:  
