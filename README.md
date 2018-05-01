@@ -26,5 +26,5 @@ In this five minute video, we discuss our project, the results, what the results
 Link - https://youtu.be/jGrqurk3ef0
 
 ### Final Paper:  
-*Link Here*
+https://docs.google.com/document/d/e/2PACX-1vTMN_zSwB29dNA7Wtv_qnauOrQoiOQ2EzdeOdY-lq8IUH6VtX2Y_SQUbX126cxEc5oenafuhzN1CbPp/pub
 
