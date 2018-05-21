@@ -7,7 +7,7 @@ chdir(path_relative(DIR_RAW_VIDEOS))
 
 clips = {
     "nyc_intersection": "https://youtu.be/MBxv-OnUZhU",
-    # "nyc_driving_pov": "https://www.youtu.be/7HaJArMDKgI",
+    "nyc_driving_pov": "https://www.youtu.be/7HaJArMDKgI",
     "biking_indonesia": "https://youtu.be/V98uMzYBlxU",
     "port_nassau": "https://youtu.be/CXECg509GJk"
 }

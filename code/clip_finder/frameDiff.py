@@ -1,9 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import cv2
-import matplotlib.pyplot as plt
-import numpy as np
 from argparse import ArgumentParser
-
 
 parser = ArgumentParser(description="frame-differ: computes and stores frame differences")
 parser.add_argument('videofile', metavar='mp4file', help="the video to use")
@@ -31,13 +28,14 @@ with open(args.savefile, "w+") as results:
         current_frame_gray = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
         previous_frame_gray = cv2.cvtColor(previous_frame, cv2.COLOR_BGR2GRAY)
 
-        frame_diff = cv2.absdiff(current_frame_gray,previous_frame_gray)
+        frame_diff = cv2.absdiff(current_frame_gray, previous_frame_gray)
         results.write("%d\r\n" % (sum(sum(frame_diff))))
         #frame_diffs.append(sum(sum(frame_diff)))
-        #cv2.imshow('frame diff ',frame_diff)
-        #
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #     break
+
+        cv2.imshow('frame diff ', frame_diff)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
         # if i%1000 == 0:
         #     print(i)
         previous_frame = current_frame
